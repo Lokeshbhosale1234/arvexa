@@ -22,7 +22,7 @@ public final class SyncWorker extends Worker {
      Api.Reply r=Api.post(base,"/capture/device/ingest",new JSONObject(vault.decrypt(row[1])),null,token);
      if(r.status==401||r.status==403){vault.status("Connection expired or revoked. Reconnect this device.");vault.enabled(false);return Result.success();}
      if(r.status==429||r.status>=500)return Result.retry();
-     if(r.status<200||r.status>=300){vault.status("An alert needs attention (server rejected it). It remains queued.");return Result.success();}
+     if(r.status<200||r.status>=300){outbox.reject(row[0],generation);vault.status("An alert was rejected and retained locally for attention. Other alerts can still sync.");continue;}
      outbox.remove(row[0],generation);vault.status("Last synced "+java.time.Instant.now()+". Check the website for imported entries or review items.");
     }
     if(outbox.count(generation)>0){schedule(getApplicationContext());return Result.success();}

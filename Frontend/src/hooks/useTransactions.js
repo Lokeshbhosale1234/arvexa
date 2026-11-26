@@ -6,22 +6,22 @@ export function useTransactions() {
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState(null)
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactions = useCallback(async (silent = false) => {
     try {
-      setLoading(true)
+      if (!silent) setLoading(true)
       setError(null)
       const data = await transactionApi.getAll()
       setTransactions(data || [])
     } catch (err) {
       setError(err.message)
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    const refresh = () => { if (!document.hidden) fetchTransactions() }
-    refresh()
+    const refresh = () => { if (!document.hidden) fetchTransactions(true) }
+    fetchTransactions()
     const timer = setInterval(refresh, 30000)
     window.addEventListener('arvexa:transactions-changed', refresh)
     document.addEventListener('visibilitychange', refresh)

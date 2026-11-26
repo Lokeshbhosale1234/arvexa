@@ -68,7 +68,7 @@ public final class MainActivity extends Activity {
  @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] results){super.onRequestPermissionsResult(code,permissions,results);
   if(code==71){if(results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)requestCapture();else{vault.enabled(false);enabled.setChecked(false);status.setText("SMS permission was declined. Automatic capture is disabled.");}}
  }
- private void refresh(){try(Outbox outbox=new Outbox(this)){status.setText(vault.status()+"\nQueued alerts: "+outbox.count()+"\nCapture: "+(vault.enabled()?"on":"off")+"\nDelivery may be delayed by Android or network availability.");}}
- @Override protected void onResume(){super.onResume();if(status!=null){if(checkSelfPermission(Manifest.permission.RECEIVE_SMS)!=PackageManager.PERMISSION_GRANTED){vault.enabled(false);enabled.setChecked(false);}refresh();}}
+ private void refresh(){try(Outbox outbox=new Outbox(this)){status.setText(vault.status()+"\nQueued alerts: "+outbox.count()+" (rejected: "+outbox.rejected()+")"+"\nCapture: "+(vault.enabled()?"on":"off")+"\nDelivery may be delayed by Android or network availability.");}}
+ @Override protected void onResume(){super.onResume();if(status!=null){enabled.setChecked(vault.enabled());if(checkSelfPermission(Manifest.permission.RECEIVE_SMS)!=PackageManager.PERMISSION_GRANTED){vault.enabled(false);enabled.setChecked(false);}refresh();}}
  @Override protected void onDestroy(){io.shutdown();super.onDestroy();}
 }

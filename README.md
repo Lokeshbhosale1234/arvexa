@@ -3,6 +3,17 @@
 Personal finance application built with React, Java 17, Spring Boot and PostgreSQL.
 Track transactions, manage category budgets, inspect spending trends and request optional Gemini-generated explanations.
 
+## Automatic capture (Android companion)
+
+Automatic tracking now has an Android companion in `Android/` and a website page at `/capture`.
+After account mapping and explicit SMS permission, supported new bank alerts sync automatically.
+Uncertain candidates go to review; duplicate alerts are idempotent. Raw SMS and OTPs are not uploaded.
+This requires installing the companion; the website alone cannot read phone SMS.
+
+See [setup, architecture, limitations and rollout checks](docs/AUTOMATIC_CAPTURE.md).
+Download the debug APK artifact from a successful Android GitHub Actions job for device testing.
+Physical-device validation and Google Play permission approval remain separate requirements.
+
 ## What works
 
 - Registration and login with BCrypt password hashing and JWT authentication.
@@ -98,7 +109,7 @@ that a run has passed; inspect the Actions results after pushing.
 
 Transaction amounts accept up to 13 integer digits and two decimal places. Invalid transaction
 filters return HTTP 400; missing or non-owned transaction IDs return HTTP 404 on deletion.
-Dashboard summary cards cover all recorded transactions, not just the current month.
+Dashboard income/expense cards cover all completed non-transfer transactions, not just the current month. Recorded transaction counts include every status.
 
 ## Deployment
 

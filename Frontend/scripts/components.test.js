@@ -30,3 +30,13 @@ test('actual insight titles are displayed and escaped as text', () => {
   assert.ok(html.includes('&lt;script&gt;hello&lt;/script&gt;'))
   assert.ok(!html.includes('<script>'))
 })
+
+
+test('capture setup is honest about requiring a phone and net movement', async () => {
+  const { default: Capture } = await vite.ssrLoadModule('/src/pages/AutomaticCapture.jsx')
+  const html = renderToStaticMarkup(React.createElement(Capture))
+  assert.ok(html.includes('This requires the Android app'))
+  assert.ok(html.includes('Last four account digits'))
+  assert.ok(html.includes('No supported alerts received yet') === false) // loading state, not invented history
+  assert.ok(!html.includes('8550'))
+})
