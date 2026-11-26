@@ -274,7 +274,7 @@ export default function Insights() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }} className="xl:grid-cols-3">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <HealthScoreWidget
-            score={typeof healthScore === 'number' ? healthScore : 72}
+            score={typeof healthScore === 'number' ? healthScore : undefined}
             breakdown={data?.healthScore?.components ? Object.entries(data.healthScore.components).map(([label, value], i) => ({
               label, value: Math.round(value), color: ['#10b981','#6366f1','#22d3ee','#a855f7'][i % 4]
             })) : undefined}

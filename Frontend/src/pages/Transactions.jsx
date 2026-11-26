@@ -3,7 +3,8 @@ import TransactionsTable   from '../components/transactions/TransactionsTable'
 import ErrorBanner         from '../components/ui/ErrorBanner'
 import { useSearchParams } from 'react-router-dom'
 import { useTransactions } from '../hooks/useTransactions'
-import { formatCurrency, CATEGORIES } from '../utils/formatters'
+import { CATEGORIES } from '../utils/formatters'
+import { downloadTransactions } from '../utils/csv'
 import { transactionApi }  from '../api/transactionApi'
 
 const Spinner = () => (
@@ -32,24 +33,22 @@ export default function Transactions() {
 
   // Pick up ?q= param set by the topbar global search
   useEffect(() => {
-    const q = searchParams.get('q')
-    if (q && q !== search) {
-      setSearch(q)
-    }
+    setSearch(searchParams.get('q') || '')
   }, [searchParams])
 
   const hasActiveFilters = search || category || type || dateFrom || dateTo || minAmount || maxAmount
 
   const applyFilters = useCallback(async () => {
     if (!hasActiveFilters) { setFiltered(null); return }
+    setFilterError(null)
     setFilterLoading(true)
     try {
       const params = new URLSearchParams()
       if (search)    params.append('search',    search.trim())
       if (category)  params.append('category',  category)
       if (type)      params.append('type',      type)
-      if (dateFrom)  params.append('dateFrom',  new Date(dateFrom).toISOString())
-      if (dateTo)    params.append('dateTo',    new Date(dateTo + 'T23:59:59').toISOString())
+      if (dateFrom)  params.append('dateFrom',  dateFrom + 'T00:00:00')
+      if (dateTo)    params.append('dateTo',    dateTo + 'T23:59:59.999999999')
       if (minAmount) params.append('minAmount', minAmount)
       if (maxAmount) params.append('maxAmount', maxAmount)
       const data = await transactionApi.search(params)
@@ -65,6 +64,7 @@ export default function Transactions() {
     setSearch(''); setCategory(''); setType('')
     setDateFrom(''); setDateTo(''); setMinAmount(''); setMaxAmount('')
     setFiltered(null)
+    setFilterError(null)
   }
 
   const handleRefresh = async () => {
@@ -150,6 +150,9 @@ export default function Transactions() {
             Filters {hasActiveFilters && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--indigo)', display: 'inline-block' }} />}
           </button>
 
+          <button onClick={() => downloadTransactions(displayData)} disabled={loading || filterLoading || displayData.length === 0} className="btn btn-ghost" style={{ height: 38, fontSize: 12 }}>
+            Export CSV ({displayData.length})
+          </button>
           {/* Actions */}
           <button onClick={applyFilters} disabled={filterLoading} className="btn btn-primary" style={{ height: 38, fontSize: 12, flexShrink: 0 }}>
             {filterLoading ? <><Spinner/>Searching</> : 'Search'}

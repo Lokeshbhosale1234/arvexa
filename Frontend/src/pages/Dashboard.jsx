@@ -26,13 +26,14 @@ export default function Dashboard() {
   const { transactions, loading: tLoading }                                  = useTransactions()
   const { analytics: budgetData, loading: bLoading }                         = useBudgetAnalytics(now.getMonth() + 1, now.getFullYear())
   const [insightData,    setInsightData]    = useState(null)
-  const [insightLoading, setInsightLoading] = useState(false)
+  const [insightLoading, setInsightLoading] = useState(true)
+  const [insightError, setInsightError] = useState(null)
 
   useEffect(() => {
     setInsightLoading(true)
     fetchInsightsSummary()
       .then(d => setInsightData(d?.data || d || null))
-      .catch(() => null)
+      .catch(() => setInsightError('Insights could not be loaded. Please refresh to retry.'))
       .finally(() => setInsightLoading(false))
   }, [])
 
@@ -56,18 +57,18 @@ export default function Dashboard() {
             {now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }} />
-          <span style={{ fontSize: 11, color: '#22c55e', fontWeight: 700 }}>All systems normal</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 99, background: aError ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)', border: `1px solid ${aError ? 'rgba(239,68,68,0.18)' : 'rgba(34,197,94,0.18)'}` }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: aError ? '#ef4444' : '#22c55e' }} />
+          <span style={{ fontSize: 11, color: aError ? '#ef4444' : '#22c55e', fontWeight: 700 }}>{aLoading ? 'Loading financial data' : aError ? 'Financial data unavailable' : 'Financial data loaded'}</span>
         </div>
       </div>
 
       {/* ── Stat row — 2 cols mobile, 4 cols desktop ──────────────── */}
       <div className="dash-stats">
-        <StatCard title="Monthly Income"   value={analytics?.totalIncome ?? 0}       color="green" icon={<IconIncome />}  loading={aLoading} prefix="₹" subtitle="This month" />
-        <StatCard title="Monthly Expenses" value={analytics?.totalExpense ?? 0}      color="red"   icon={<IconExpense />} loading={aLoading} prefix="₹" subtitle="Total spent" />
+        <StatCard title="Total Income"   value={analytics?.totalIncome ?? 0}       color="green" icon={<IconIncome />}  loading={aLoading} prefix="₹" subtitle="All recorded transactions" />
+        <StatCard title="Total Expenses" value={analytics?.totalExpense ?? 0}      color="red"   icon={<IconExpense />} loading={aLoading} prefix="₹" subtitle="All recorded expenses" />
         <StatCard title="Net Savings"      value={savings}                            color="mono"  icon={<IconBalance />} loading={aLoading} prefix="₹" subtitle={`${savingsRate}% savings rate`} />
-        <StatCard title="Transactions"     value={analytics?.totalTransactions ?? 0} color="mono"  icon={<IconCount />}   loading={aLoading} prefix="" subtitle="This month" />
+        <StatCard title="Transactions"     value={analytics?.totalTransactions ?? 0} color="mono"  icon={<IconCount />}   loading={aLoading} prefix="" subtitle="All recorded transactions" />
       </div>
 
       {/* ── Main 3-column grid ────────────────────────────────────── */}
@@ -85,7 +86,7 @@ export default function Dashboard() {
         {/* Health Score — narrow */}
         <div className="col-1">
           <HealthScoreWidget
-            score={insightData?.healthScore?.score ?? 72}
+            score={insightData?.healthScore?.score}
             breakdown={[
               { label: 'Savings Rate',     value: insightData?.healthScore?.savingsRatio ?? 0,       color: '#22c55e' },
               { label: 'Budget Adherence', value: insightData?.healthScore?.budgetAdherence ?? 0,     color: '#ffffff' },
@@ -93,6 +94,7 @@ export default function Dashboard() {
               { label: 'Overspending',     value: insightData?.healthScore?.overspendingPenalty ?? 0, color: '#ef4444' },
             ]}
             loading={insightLoading}
+            error={insightError}
           />
         </div>
 
@@ -111,6 +113,7 @@ export default function Dashboard() {
           <AIRecommendations
             insights={insightData?.insights || insightData?.topInsights || []}
             loading={insightLoading}
+            error={insightError}
           />
         </div>
 

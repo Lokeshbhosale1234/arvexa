@@ -7,30 +7,31 @@ function getScoreConfig(score) {
   return              { color: '#ef4444', label: 'Needs Work' }
 }
 
-export default function HealthScoreWidget({ score = 72, breakdown, loading }) {
+export default function HealthScoreWidget({ score, breakdown, loading, error }) {
   const [animatedScore, setAnimatedScore] = useState(0)
   const cfg = getScoreConfig(score)
 
   useEffect(() => {
-    if (loading) return
+    if (loading || !Number.isFinite(score)) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setAnimatedScore(score)
+      return
+    }
+    let frame
     const start = Date.now(), duration = 1000
     const raf = () => {
       const p = Math.min((Date.now() - start) / duration, 1)
       setAnimatedScore(Math.round((1 - Math.pow(1 - p, 3)) * score))
-      if (p < 1) requestAnimationFrame(raf)
+      if (p < 1) frame = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf)
+    frame = requestAnimationFrame(raf)
+    return () => cancelAnimationFrame(frame)
   }, [score, loading])
 
   const R = 44, C = 2 * Math.PI * R
   const dashOffset = C * (1 - animatedScore / 100)
 
-  const bars = breakdown || [
-    { label: 'Savings Rate',     value: 35, color: '#22c55e' },
-    { label: 'Budget Adherence', value: 60, color: '#ffffff' },
-    { label: 'Expense Control',  value: 75, color: '#888888' },
-    { label: 'Overspending',     value: 5,  color: '#ef4444' },
-  ]
+  const bars = breakdown || []
 
   if (loading) return (
     <div className="card" style={{ padding: 18 }}>
@@ -41,6 +42,13 @@ export default function HealthScoreWidget({ score = 72, breakdown, loading }) {
           {[1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 7, marginBottom: 10, width: `${80 + i * 3}%` }} />)}
         </div>
       </div>
+    </div>
+  )
+
+  if (!Number.isFinite(score)) return (
+    <div className="card" style={{ padding: 18 }} role="status">
+      <h3>Health Score</h3>
+      <p style={{ color: 'var(--text-secondary)', marginTop: 12 }}>{error || 'No health score available yet. Add transactions to begin.'}</p>
     </div>
   )
 
@@ -81,7 +89,7 @@ export default function HealthScoreWidget({ score = 72, breakdown, loading }) {
                 <span className="font-mono" style={{ fontSize: 10, color: bar.color, fontWeight: 600 }}>{bar.value}%</span>
               </div>
               <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${bar.value}%`, background: bar.color }} />
+                <div className="progress-fill" style={{ width: `${Math.max(0, Math.min(100, bar.value))}%`, background: bar.color }} />
               </div>
             </div>
           ))}

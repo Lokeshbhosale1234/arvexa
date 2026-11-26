@@ -4,7 +4,7 @@ import CategoryPieChart from '../components/dashboard/CategoryPieChart'
 import MonthlyBarChart  from '../components/dashboard/MonthlyBarChart'
 import ErrorBanner      from '../components/ui/ErrorBanner'
 import { useAnalytics } from '../hooks/useAnalytics'
-import { formatCurrency, CATEGORY_COLORS } from '../utils/formatters'
+import { formatCurrency } from '../utils/formatters'
 
 const CAT_ICONS = {
   'Food': '🍜', 'Dining': '🍜', 'Entertainment': '🎬', 'Transport': '🚗',

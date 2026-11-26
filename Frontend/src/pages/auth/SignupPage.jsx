@@ -54,7 +54,7 @@ export default function SignupPage() {
     }
   }
 
-  const label = (text) => ({ display: 'block', fontSize: 10, fontWeight: 700, color: '#444444', marginBottom: 7, textTransform: 'uppercase', letterSpacing: '0.08em' })
+  const label = (_text) => ({ display: 'block', fontSize: 10, fontWeight: 700, color: '#444444', marginBottom: 7, textTransform: 'uppercase', letterSpacing: '0.08em' })
 
   return (
     <div style={{ minHeight: '100dvh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
