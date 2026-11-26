@@ -9,6 +9,7 @@ public interface EventRepository extends JpaRepository<CaptureEvent,Long> {
  Optional<CaptureEvent> findByIdAndUser(Long id,User user);
  List<CaptureEvent> findByUserOrderByIdDesc(User user, Pageable page);
  List<CaptureEvent> findByUserAndStateOrderByIdDesc(User user,String state, Pageable page);
+ List<CaptureEvent> findByUserAndStateAndBankAndSuffixAndReferenceIsNotNull(User user,String state,String bank,String suffix);
  List<CaptureEvent> findByUserAndReference(User user,String reference);
  @Query("select e from CaptureEvent e left join fetch e.transaction where e.user=:user and e.account is not null")
  List<CaptureEvent> findAccountEvents(@Param("user") User user);

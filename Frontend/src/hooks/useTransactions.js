@@ -35,12 +35,14 @@ export function useTransactions() {
   const addTransaction = useCallback(async (payload) => {
     const created = await transactionApi.create(payload)
     setTransactions((prev) => [created, ...prev])
+    window.dispatchEvent(new Event('arvexa:transactions-changed'))
     return created
   }, [])
 
   const deleteTransaction = useCallback(async (id) => {
     await transactionApi.delete(id)
     setTransactions((prev) => prev.filter((t) => t.id !== id))
+    window.dispatchEvent(new Event('arvexa:transactions-changed'))
   }, [])
 
   return { transactions, loading, error, addTransaction, deleteTransaction, refetch: fetchTransactions }

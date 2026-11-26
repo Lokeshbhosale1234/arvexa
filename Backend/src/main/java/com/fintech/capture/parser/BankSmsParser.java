@@ -19,7 +19,7 @@ public final class BankSmsParser {
     private static final Pattern SENDER = Pattern.compile("^(?:[A-Z]{2}-)?([A-Z]{6})(?:-[A-Z])?$", Pattern.CASE_INSENSITIVE);
     private static final Pattern UNSAFE = Pattern.compile("\\b(?:otp|one[ -]time|verification code|failed|declined|unsuccessful|pending|collect request|payment request|requested|scheduled|will be debited|due date|minimum due|autopay mandate)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern ACCOUNT = Pattern.compile("(?i)\\b(?:a/c|a\\s*cct|acct|account|ac)(?:\\s*(?:no\\.?|number|ending(?:\\s+in)?))?\\s*[:.-]?\\s*([xX*#]+\\s*\\d{4,}|\\d{4,})");
-    private static final String MONEY = "(?:INR|Rs\\.?|₹)\\s*([0-9]+(?:,[0-9]+)*(?:\\.[0-9]{1,2})?)(?![0-9.])";
+    private static final String MONEY = "(?:INR|Rs\\.?|₹)\\s*([0-9]+(?:,[0-9]+)*(?:\\.[0-9]{1,2})?)(?![0-9,]|\\.[0-9])";
     private static final Pattern AMOUNT = Pattern.compile(MONEY, Pattern.CASE_INSENSITIVE);
     private static final Pattern DIRECTION = Pattern.compile("\\b(debited|credited|withdrawn|spent|paid|received|debit|credit)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern REF = Pattern.compile("(?i)\\b(?:UPI\\s*(?:ref(?:erence)?|txn(?:\\s*id)?)?|ref(?:erence)?(?:\\s*(?:no\\.?|number))?|UTR|RRN|txn(?:\\s*id)?|transaction\\s*(?:id|ref))\\s*[:#.-]?\\s*([A-Z0-9]{6,40})\\b");

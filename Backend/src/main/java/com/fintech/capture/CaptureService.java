@@ -81,7 +81,7 @@ public class CaptureService {
   User u=locked(user(email));bank(r.bank());
   if(accounts.findByUserAndBankAndSuffix(u,r.bank(),r.suffix()).isPresent()) throw new IllegalArgumentException("This bank/account ending is already mapped");
   BankAccount a=new BankAccount();a.setUser(u);a.setBank(r.bank());a.setSuffix(r.suffix());a.setLabel(r.label().trim());accounts.save(a);
-  for(CaptureEvent e:events.findByUserAndStateOrderByIdDesc(u,"NEEDS_REVIEW",PageRequest.of(0,200)))
+  for(CaptureEvent e:events.findByUserAndStateAndBankAndSuffixAndReferenceIsNotNull(u,"NEEDS_REVIEW",r.bank(),r.suffix()))
    if(r.bank().equals(e.getBank()) && r.suffix().equals(e.getSuffix()) && e.getReference()!=null) post(e,a,"Uncategorized");
   return new CaptureDTO.AccountView(a.getId(),a.getBank(),a.getSuffix(),a.getLabel(),BigDecimal.ZERO,0);
  }

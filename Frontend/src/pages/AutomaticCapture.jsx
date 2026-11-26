@@ -33,11 +33,12 @@ export default function AutomaticCapture() {
   const [accounts, setAccounts] = useState([]), [events, setEvents] = useState([]), [devices, setDevices] = useState([])
   const [loading, setLoading] = useState(true), [error, setError] = useState(null), [busy, setBusy] = useState(false)
   const [form, setForm] = useState({ bank: 'HDFC', suffix: '', label: '' })
+  const [review, setReview] = useState([])
   const [updatedAt, setUpdatedAt] = useState(null)
   const load = useCallback(async () => {
     try {
-      const [a, e, d] = await Promise.all([captureApi.accounts(), captureApi.events(), captureApi.devices()])
-      setAccounts(a); setEvents(e); setDevices(d); setUpdatedAt(new Date()); setError(null)
+      const [a, e, d, pending] = await Promise.all([captureApi.accounts(), captureApi.events(), captureApi.devices(), captureApi.review()])
+      setAccounts(a); setEvents(e); setDevices(d); setReview(pending); setUpdatedAt(new Date()); setError(null)
     } catch (e) { setError(e.message) } finally { setLoading(false) }
   }, [])
   useEffect(() => {
@@ -53,7 +54,6 @@ export default function AutomaticCapture() {
     try { await fn(); await load(); window.dispatchEvent(new Event('arvexa:transactions-changed')) }
     catch (e) { setError(e.message) } finally { setBusy(false) }
   }
-  const review = events.filter(e => e.state === 'NEEDS_REVIEW')
   return <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
     <div><h2 style={{ fontSize: 24, fontWeight: 700 }}>Automatic Capture</h2><p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Connect your Android phone once. Supported bank SMS will appear in your transaction history automatically.</p></div>
     <ErrorBanner message={error} onRetry={load} />
@@ -78,9 +78,9 @@ export default function AutomaticCapture() {
         </div>
       </form>
     </section>
-    <section aria-labelledby="capture-review"><h3 id="capture-review" style={{ marginBottom: 10 }}>Needs review · {review.length}{events.length === 100 ? ' (latest 100 alerts)' : ''}</h3>
+    <section aria-labelledby="capture-review"><h3 id="capture-review" style={{ marginBottom: 10 }}>Needs review · {review.length}{review.length === 100 ? ' (showing 100; handle these to load more)' : ''}</h3>
       {review.map(e => <ReviewAlert key={e.id} event={e} accounts={accounts} busy={busy} onConfirm={(id, a, c) => act(() => captureApi.confirm(id, a, c))} onIgnore={id => act(() => captureApi.ignore(id))} />)}
-      {!loading && review.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No review items in the latest alerts.</p>}
+      {!loading && review.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No alerts waiting for review.</p>}
     </section>
     <section className="card" style={{ padding: 20 }} aria-labelledby="capture-devices"><h3 id="capture-devices">Connected devices</h3>
       {devices.map(d => <div key={d.id} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--border)' }}>

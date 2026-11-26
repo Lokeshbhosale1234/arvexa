@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-@Entity @Table(name="capture_events",uniqueConstraints=@UniqueConstraint(columnNames={"user_id","dedupe_key"}))
+@Entity @Table(name="capture_events",indexes={@Index(name="idx_capture_user_state",columnList="user_id,state"),@Index(name="idx_capture_user_ref",columnList="user_id,bank_reference")},uniqueConstraints=@UniqueConstraint(columnNames={"user_id","dedupe_key"}))
 @Getter @Setter @NoArgsConstructor
 public class CaptureEvent {
  @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
