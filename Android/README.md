@@ -6,12 +6,13 @@ It does not request READ_SMS, notification-listener access, accessibility, conta
 
 ## Build
 
-Open Android/ in Android Studio, use JDK 17 and Gradle 8.9, install Android SDK 35.
-Alternatively with Gradle 8.9 installed:
+Open Android/ in Android Studio, use JDK 17 and install Android SDK 35.
+The checked-in Gradle 8.9 wrapper pins the distribution SHA-256 checksum.
+Alternatively from a terminal (use gradlew.bat on Windows):
 
 ```sh
 cd Android
-gradle :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 ```
 
 The GitHub Actions Android job publishes a debug APK artifact. A debug APK is for testing,
