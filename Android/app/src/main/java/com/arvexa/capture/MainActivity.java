@@ -66,9 +66,10 @@ public final class MainActivity extends Activity {
    // Reconnection preserves this owner's encrypted outbox. Switching an account with pending data requires explicit disconnect.
    if(!sameOwner){vault.enabled(false);try(Outbox outbox=new Outbox(this)){outbox.clear();}}
    vault.save(new JSONObject().put("base",url).put("owner",owner).put("token",data.getString("token")).put("generation",generation).toString());
-   runOnUiThread(()->{password.setText("");connect.setEnabled(true);requestCapture();});
-  }catch(Exception e){runOnUiThread(()->{status.setText(e instanceof IllegalStateException?e.getMessage():"Connection failed. Check server availability and try again.");connect.setEnabled(true);});}});
+   ui(()->{password.setText("");connect.setEnabled(true);requestCapture();});
+  }catch(Exception e){ui(()->{status.setText(e instanceof IllegalStateException?e.getMessage():"Connection failed. Check server availability and try again.");connect.setEnabled(true);});}});
  }
+ private void ui(Runnable action){runOnUiThread(()->{if(!isFinishing()&&!isDestroyed())action.run();});}
  private void requestCapture(){
   if(checkSelfPermission(Manifest.permission.RECEIVE_SMS)!=PackageManager.PERMISSION_GRANTED){requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS},71);return;}
   vault.enabled(true);enabled.setChecked(true);SyncWorker.periodic(this);SyncWorker.schedule(this);refresh();
