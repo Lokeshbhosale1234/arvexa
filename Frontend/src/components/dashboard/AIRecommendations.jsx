@@ -1,33 +1,12 @@
 import React, { useState } from 'react'
 
-const RECS = [
-  {
-    id: 1, type: 'saving',
-    title: 'Reduce dining spend by 20%',
-    body: 'You spent ₹8,400 on Food & Dining this month — 32% above your average. Cutting back could save ₹1,680/month.',
-    impact: '+₹1,680/mo', color: '#10b981', bg: 'rgba(16,185,129,0.06)',
-  },
-  {
-    id: 2, type: 'alert',
-    title: 'Entertainment budget at 89%',
-    body: 'You\'ve used ₹2,136 of your ₹2,400 entertainment budget with 12 days remaining.',
-    impact: 'Budget alert', color: '#f59e0b', bg: 'rgba(245,158,11,0.06)',
-  },
-  {
-    id: 3, type: 'insight',
-    title: 'Savings rate improved 8%',
-    body: 'Your savings rate increased from 18% to 26% compared to last month. Keep up the momentum!',
-    impact: '26% rate', color: '#6366f1', bg: 'rgba(99,102,241,0.06)',
-  },
-]
-
 const TypeIcon = ({ type }) => {
   if (type === 'saving') return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
   if (type === 'alert')   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
 }
 
-export default function AIRecommendations({ insights, loading }) {
+export default function AIRecommendations({ insights, loading, error }) {
   const [expanded, setExpanded] = useState(null)
   const recs = insights?.length ? insights.slice(0, 3).map((ins, i) => ({
     id: i, type: ins.severity === 'danger' ? 'alert' : ins.severity === 'success' ? 'insight' : 'saving',
@@ -36,7 +15,7 @@ export default function AIRecommendations({ insights, loading }) {
     impact: ins.potentialSavings ? `+₹${Math.round(ins.potentialSavings).toLocaleString('en-IN')}/mo` : 'Action',
     color: ins.severity === 'danger' ? '#f43f5e' : ins.severity === 'success' ? '#10b981' : '#6366f1',
     bg: ins.severity === 'danger' ? 'rgba(244,63,94,0.06)' : ins.severity === 'success' ? 'rgba(16,185,129,0.06)' : 'rgba(99,102,241,0.06)',
-  })) : RECS
+  })) : []
 
   if (loading) {
     return (
@@ -51,14 +30,15 @@ export default function AIRecommendations({ insights, loading }) {
     <div className="card" style={{ padding: 20 }}>
       <div className="section-header">
         <div>
-          <span className="section-title">AI Recommendations</span>
+          <span className="section-title">Spending Insights</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Live AI</span>
+          <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Based on your records</span>
         </div>
       </div>
 
+      {recs.length === 0 && <p role="status" style={{ color: 'var(--text-secondary)', fontSize: 13 }}>{error || 'No insights to show yet. Add transactions and budgets to build your financial picture.'}</p>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {recs.map((rec, i) => (
           <div

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null

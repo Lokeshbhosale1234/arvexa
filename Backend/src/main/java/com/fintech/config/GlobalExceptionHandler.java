@@ -2,47 +2,45 @@ package com.fintech.config;
 
 import com.fintech.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        log.warn("Validation failed: {}", errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error("Validation failed"));
+    public ResponseEntity<ApiResponse<Map<String, String>>> validation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(e -> errors.putIfAbsent(e.getField(), e.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(ApiResponse.<Map<String, String>>builder()
+                .success(false).message("Validation failed").data(errors).build());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
-        log.error("Runtime exception: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage()));
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiResponse<Void>> status(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ApiResponse.error(ex.getReason()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> invalid(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ApiResponse<Void>> malformed(Exception ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error("Invalid request value or format"));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
-
-        log.error("Unexpected error", ex);
-
+    public ResponseEntity<ApiResponse<Void>> unexpected(Exception ex) {
+        log.error("Unhandled request failure", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiResponse.error("An unexpected server error occurred. Please try again."));
     }
 }

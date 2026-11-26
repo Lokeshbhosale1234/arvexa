@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Sidebar from './Sidebar'
 import Topbar  from './Topbar'
 
@@ -31,6 +31,8 @@ export default function Layout({ children, onAddTransaction }) {
     return () => obs.disconnect()
   }, [])
 
+  const closeMobile = useCallback(() => setMobileOpen(false), [])
+
   const marginLeft = isMobile ? 0 : sidebarWidth
 
   return (
@@ -44,7 +46,7 @@ export default function Layout({ children, onAddTransaction }) {
 
       <Sidebar
     mobileOpen={mobileOpen}
-    onMobileClose={() => setMobileOpen(false)}
+    onMobileClose={closeMobile}
     collapsed={collapsed}
 />
 

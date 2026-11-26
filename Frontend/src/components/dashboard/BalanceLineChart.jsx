@@ -1,9 +1,8 @@
 import React from 'react'
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend
+  CartesianGrid, Tooltip
 } from 'recharts'
-import { formatCurrency } from '../../utils/formatters'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null

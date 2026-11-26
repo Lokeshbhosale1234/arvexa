@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import Insights from './pages/Insights'
+const Insights = lazy(() => import('./pages/Insights'))
 
-//  Global Axios interceptors — must be imported before any API call
-import './api/axiosSetup'
 
 import { AuthProvider }       from './context/AuthContext'
 import ProtectedRoute         from './components/auth/ProtectedRoute'
 import Layout                 from './components/layout/Layout'
-import Dashboard              from './pages/Dashboard'
-import Transactions           from './pages/Transactions'
-import Analytics              from './pages/Analytics'
-import BudgetsPage            from './pages/budget/BudgetsPage'
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Transactions = lazy(() => import('./pages/Transactions'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const BudgetsPage = lazy(() => import('./pages/budget/BudgetsPage'))
 import LoginPage              from './pages/auth/LoginPage'
 import SignupPage             from './pages/auth/SignupPage'
 import AddTransactionModal    from './components/transactions/AddTransactionModal'
@@ -136,7 +134,7 @@ export default function App() {
 
   useEffect(() => {
 
-    fetch('https://zentriq-backend.onrender.com/api/auth/login', {
+    fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://zentriq-backend.onrender.com/api'}/auth/login`, {
       method: 'OPTIONS',
     }).catch(() => {})
 
@@ -145,6 +143,7 @@ export default function App() {
   return (
     <BrowserRouter>
 
+      <Suspense fallback={<p role="status" style={{ padding: 24 }}>Loading Arvexa…</p>}>
       <AuthProvider>
 
         <Routes>
@@ -168,6 +167,7 @@ export default function App() {
         </Routes>
 
       </AuthProvider>
+      </Suspense>
 
     </BrowserRouter>
   )

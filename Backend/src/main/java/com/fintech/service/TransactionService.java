@@ -66,11 +66,21 @@ public class TransactionService {
 
                 if (type != null && !type.isBlank()) {
                         try {
-                                typeEnum = TransactionType.valueOf(type.toUpperCase());
-                        } catch (IllegalArgumentException ignored) {
+                                typeEnum = TransactionType.valueOf(type.trim().toUpperCase(Locale.ROOT));
+                        } catch (IllegalArgumentException invalidType) {
+                                throw new IllegalArgumentException("Type must be CREDIT or DEBIT");
                         }
                 }
 
+                if (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo)) {
+                        throw new IllegalArgumentException("From date must be on or before to date");
+                }
+                if ((minAmount != null && minAmount.signum() < 0) || (maxAmount != null && maxAmount.signum() < 0)) {
+                        throw new IllegalArgumentException("Amount filters cannot be negative");
+                }
+                if (minAmount != null && maxAmount != null && minAmount.compareTo(maxAmount) > 0) {
+                        throw new IllegalArgumentException("Minimum amount cannot exceed maximum amount");
+                }
                 return transactionRepository.findAll(
                                 TransactionSpecification.filterTransactions(
                                                 user,
@@ -138,8 +148,8 @@ public class TransactionService {
 
                 Transaction transaction = transactionRepository
                                 .findByIdAndUser(id, user)
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Transaction not found with id: " + id));
+                                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                                                org.springframework.http.HttpStatus.NOT_FOUND, "Transaction not found"));
 
                 transactionRepository.delete(transaction);
 

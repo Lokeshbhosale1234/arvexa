@@ -78,7 +78,7 @@ export default function Sidebar({mobileOpen,onMobileClose,collapsed }) {
 
   const accountRef = useRef(null)
 
-  useEffect(() => { onMobileClose?.() }, [location.pathname])
+  useEffect(() => { onMobileClose?.() }, [location.pathname, onMobileClose])
 
   // Close account popover on outside click
   useEffect(() => {

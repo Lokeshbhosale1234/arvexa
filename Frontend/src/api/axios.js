@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://zentriq-backend.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://zentriq-backend.onrender.com/api',
 
   // 30 seconds timeout
   timeout: 30000,
@@ -65,7 +65,7 @@ api.interceptors.response.use(
 
       return Promise.reject(
         new Error(
-          'Backend server is waking up. Please wait a few seconds and try again.'
+          'The server did not respond in time. It may be starting or unavailable. Please retry shortly.'
         )
       )
     }
