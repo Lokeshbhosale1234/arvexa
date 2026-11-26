@@ -19,7 +19,18 @@ export function useAnalytics() {
     }
   }, [])
 
-  useEffect(() => { fetchAnalytics() }, [fetchAnalytics])
+  useEffect(() => {
+    const refresh = () => { if (!document.hidden) fetchAnalytics() }
+    refresh()
+    const timer = setInterval(refresh, 30000)
+    window.addEventListener('arvexa:transactions-changed', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener('arvexa:transactions-changed', refresh)
+      document.removeEventListener('visibilitychange', refresh)
+    }
+  }, [fetchAnalytics])
 
   return { analytics, loading, error, refetch: fetchAnalytics }
 }

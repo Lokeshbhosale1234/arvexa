@@ -47,7 +47,7 @@ public class InsightService {
          */
         public List<InsightDTO> getInsights(User user) {
 
-                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user);
+                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user).stream().filter(t -> t.getStatus() == com.fintech.entity.TransactionStatus.COMPLETED && !Boolean.TRUE.equals(t.getInternalTransfer())).toList();
 
                 List<Budget> budgets = budgetRepository.findByUserOrderByYearDescMonthDescCategoryAsc(user);
 
@@ -59,7 +59,7 @@ public class InsightService {
          */
         public HealthScoreDTO getHealthScore(User user) {
 
-                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user);
+                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user).stream().filter(t -> t.getStatus() == com.fintech.entity.TransactionStatus.COMPLETED && !Boolean.TRUE.equals(t.getInternalTransfer())).toList();
 
                 List<Budget> budgets = budgetRepository.findByUserOrderByYearDescMonthDescCategoryAsc(user);
 
@@ -72,7 +72,7 @@ public class InsightService {
          */
         public InsightSummaryDTO getSummary(User user) {
 
-                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user);
+                List<Transaction> transactions = transactionRepository.findByUserOrderByTransactionDateDesc(user).stream().filter(t -> t.getStatus() == com.fintech.entity.TransactionStatus.COMPLETED && !Boolean.TRUE.equals(t.getInternalTransfer())).toList();
 
                 List<Budget> budgets = budgetRepository.findByUserOrderByYearDescMonthDescCategoryAsc(user);
 

@@ -80,8 +80,8 @@ export default function Transactions() {
   }
 
   const displayData = filtered !== null ? filtered : transactions
-  const income  = displayData.filter(t => t.type === 'CREDIT' || t.type === 'INCOME').reduce((s, t) => s + parseFloat(t.amount || 0), 0)
-  const expense = displayData.filter(t => t.type === 'DEBIT'  || t.type === 'EXPENSE').reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+  const income  = displayData.filter(t => t.status === 'COMPLETED' && !t.internalTransfer && (t.type === 'CREDIT' || t.type === 'INCOME')).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+  const expense = displayData.filter(t => t.status === 'COMPLETED' && !t.internalTransfer && (t.type === 'DEBIT' || t.type === 'EXPENSE')).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
 
   const inputStyle = {
     background: 'var(--bg-input)', border: '1px solid var(--border)',

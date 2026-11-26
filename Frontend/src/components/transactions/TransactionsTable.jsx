@@ -108,7 +108,7 @@ export default function TransactionsTable({ transactions, loading, onDelete, tot
             ) : (
               list.map((t, rowIdx) => {
                 const isCredit   = t.type === 'CREDIT'
-                const status     = STATUS_CONFIG[t.status] || { label: t.status, cls: 'badge-cyan' }
+                const status     = STATUS_CONFIG[t.internalTransfer ? 'TRANSFER' : t.status] || { label: t.status, cls: 'badge-cyan' }
                 const catColor   = getCategoryColor(t.category)
                 const emoji      = CAT_EMOJI[t.category] || '💸'
                 const isDeleting = deletingId === t.id

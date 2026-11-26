@@ -39,6 +39,8 @@ public class TransactionDTO {
     @NotNull(message = "Status is required")
     private TransactionStatus status;
 
+    private Boolean internalTransfer;
+
     @Size(max = 255, message = "Category must be at most 255 characters")
     @NotBlank(message = "Category is required")
     private String category;

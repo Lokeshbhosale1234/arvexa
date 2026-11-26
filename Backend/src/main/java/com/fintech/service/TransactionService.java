@@ -273,6 +273,7 @@ public class TransactionService {
                                 .amount(t.getAmount())
                                 .type(t.getType())
                                 .status(t.getStatus())
+                                .internalTransfer(t.getInternalTransfer())
                                 .category(t.getCategory())
                                 .transactionDate(t.getTransactionDate())
                                 .createdAt(t.getCreatedAt())
@@ -285,7 +286,7 @@ public class TransactionService {
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 return transactionRepository
-                                .findByUserEmailOrderByTransactionDateDesc(email);
+                                .findByUserEmailOrderByTransactionDateDesc(email).stream().filter(t -> t.getStatus() == TransactionStatus.COMPLETED && !Boolean.TRUE.equals(t.getInternalTransfer())).toList();
         }
 
         private String getCurrentUserEmail() {

@@ -35,14 +35,14 @@ public interface TransactionRepository
         @Query("""
                             SELECT COALESCE(SUM(t.amount), 0)
                             FROM Transaction t
-                            WHERE t.type = :type
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.type = :type
                         """)
         BigDecimal sumByType(@Param("type") TransactionType type);
 
         @Query("""
                             SELECT COALESCE(SUM(t.amount), 0)
                             FROM Transaction t
-                            WHERE t.user = :user
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.user = :user
                               AND t.type = :type
                         """)
         BigDecimal sumByUserAndType(
@@ -68,7 +68,7 @@ public interface TransactionRepository
         @Query("""
                             SELECT t.category, COALESCE(SUM(t.amount), 0)
                             FROM Transaction t
-                            WHERE t.type = :type
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.type = :type
                             GROUP BY t.category
                         """)
         List<Object[]> findCategoryBreakdown(
@@ -77,7 +77,7 @@ public interface TransactionRepository
         @Query("""
                             SELECT t.category, COALESCE(SUM(t.amount), 0)
                             FROM Transaction t
-                            WHERE t.user = :user
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.user = :user
                               AND t.type = :type
                             GROUP BY t.category
                         """)
@@ -92,7 +92,7 @@ public interface TransactionRepository
                                    t.type,
                                    COALESCE(SUM(t.amount), 0) as total
                             FROM Transaction t
-                            WHERE t.transactionDate >= :startDate
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.transactionDate >= :startDate
                             GROUP BY FUNCTION('to_char', t.transactionDate, 'YYYY-MM'), t.type
                             ORDER BY month ASC
                         """)
@@ -104,7 +104,7 @@ public interface TransactionRepository
                                    t.type,
                                    COALESCE(SUM(t.amount), 0) as total
                             FROM Transaction t
-                            WHERE t.user = :user
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.user = :user
                               AND t.transactionDate >= :startDate
                             GROUP BY FUNCTION('to_char', t.transactionDate, 'YYYY-MM'), t.type
                             ORDER BY month ASC
@@ -118,7 +118,7 @@ public interface TransactionRepository
         @Query("""
                             SELECT COALESCE(SUM(t.amount), 0)
                             FROM Transaction t
-                            WHERE t.user      = :user
+                            WHERE t.status = com.fintech.entity.TransactionStatus.COMPLETED AND coalesce(t.internalTransfer, false) = false AND t.user      = :user
                               AND t.category  = :category
                               AND t.type      = :type
                               AND EXTRACT(MONTH FROM t.transactionDate) = :month
