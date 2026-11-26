@@ -43,6 +43,9 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionStatus status;
 
+    // Nullable for existing records; only capture reconciliation sets this flag.
+    private Boolean internalTransfer;
+
     @Column(nullable = false)
     private String category;
 

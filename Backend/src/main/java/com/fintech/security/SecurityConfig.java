@@ -40,6 +40,7 @@ public class SecurityConfig {
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/capture/device/ingest", "/api/capture/device/heartbeat").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/transactions/**").authenticated()
                         .anyRequest().authenticated()

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 
 const PAGE_TITLES = {
   '/':             { title: 'Overview',     sub: 'Your financial overview' },
+  '/capture':      { title: 'Automatic Capture', sub: 'Your connected phone and bank accounts' },
   '/transactions': { title: 'Transactions', sub: 'Manage your money flow' },
   '/analytics':    { title: 'Analytics',    sub: 'Spending patterns & trends' },
   '/budgets':      { title: 'Budgets',      sub: 'Track your spending limits' },

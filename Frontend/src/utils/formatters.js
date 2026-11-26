@@ -58,6 +58,7 @@ export const CATEGORY_COLORS = [
 ]
 
 export const STATUS_CONFIG = {
+  TRANSFER: { label: 'Internal transfer', cls: 'badge-purple' },
   COMPLETED: { label: 'Completed', cls: 'badge-green' },
   PENDING:   { label: 'Pending',   cls: 'badge-amber' },
   FAILED:    { label: 'Failed',    cls: 'badge-red' },

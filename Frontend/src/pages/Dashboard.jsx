@@ -10,7 +10,7 @@ import AIRecommendations   from '../components/dashboard/AIRecommendations'
 import { useAnalytics }    from '../hooks/useAnalytics'
 import { useTransactions } from '../hooks/useTransactions'
 import { useBudgetAnalytics } from '../hooks/useBudgetAnalytics'
-import { fetchInsightsSummary } from '../api/insights'
+import { fetchInsights, fetchHealthScore } from '../api/insights'
 import { useAuth }         from '../context/AuthContext'
 
 /* ── Icons ──────────────────────────────────────────────────────── */
@@ -30,11 +30,27 @@ export default function Dashboard() {
   const [insightError, setInsightError] = useState(null)
 
   useEffect(() => {
-    setInsightLoading(true)
-    fetchInsightsSummary()
-      .then(d => setInsightData(d?.data || d || null))
-      .catch(() => setInsightError('Insights could not be loaded. Please refresh to retry.'))
-      .finally(() => setInsightLoading(false))
+    let active = true
+    let inFlight = false
+    const refresh = async () => {
+      if (document.hidden || inFlight) return
+      inFlight = true
+      try {
+        const [insights, healthScore] = await Promise.all([fetchInsights(), fetchHealthScore()])
+        if (active) { setInsightData({ insights, healthScore }); setInsightError(null) }
+      } catch {
+        if (active) setInsightError('Insights could not be loaded. Please refresh to retry.')
+      } finally { inFlight = false; if (active) setInsightLoading(false) }
+    }
+    refresh()
+    const timer = setInterval(refresh, 30000)
+    window.addEventListener('arvexa:transactions-changed', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      active = false; clearInterval(timer)
+      window.removeEventListener('arvexa:transactions-changed', refresh)
+      document.removeEventListener('visibilitychange', refresh)
+    }
   }, [])
 
   const greeting    = now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening'

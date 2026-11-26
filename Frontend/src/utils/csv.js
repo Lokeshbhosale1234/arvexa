@@ -8,7 +8,7 @@ export function csvCell(value) {
 export function transactionsToCsv(transactions) {
   const rows = [['Date', 'Title', 'Description', 'Type', 'Category', 'Status', 'Amount (INR)']]
   for (const t of transactions) {
-    rows.push([t.transactionDate, t.title, t.description, t.type, t.category, t.status, t.amount])
+    rows.push([t.transactionDate, t.title, t.description, t.type, t.category, t.internalTransfer ? 'INTERNAL_TRANSFER' : t.status, t.amount])
   }
   return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n')
 }

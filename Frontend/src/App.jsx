@@ -1,6 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+const AutomaticCapture = lazy(() => import('./pages/AutomaticCapture'))
+
 const Insights = lazy(() => import('./pages/Insights'))
 
 
@@ -84,6 +86,7 @@ function AppInner() {
 
           <Route path="/"             element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/capture" element={<AutomaticCapture />} />
           <Route path="/analytics"    element={<Analytics />} />
           <Route path="/budgets"      element={<BudgetsPage />} />
           <Route path="/ai"           element={<Insights />} />
