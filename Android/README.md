@@ -27,7 +27,7 @@ not a production Play Store release. No signing keystore or release credentials 
 5. Check imported entries, review items and last device contact on the website.
 
 The login JWT is exchanged for a scoped 90-day device token; the password/JWT are not persisted.
-Device tokens and queued extracted fields use Android Keystore AES-GCM encryption. Android backup
+Reconnecting the same account/server preserves queued alerts; switching with pending data requires explicit disconnect. Device tokens and queued extracted fields use Android Keystore AES-GCM encryption. Android backup
 is disabled. Revoke devices on the website. Reconnect after expiry. The app never logs or uploads raw SMS.
 
 ## Coverage and limitations

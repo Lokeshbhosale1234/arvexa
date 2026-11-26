@@ -51,13 +51,21 @@ public final class MainActivity extends Activity {
   io.execute(()->{try{
    Api.Reply login=Api.post(url,"/auth/login",new JSONObject().put("email",mail).put("password",pass),null,null);
    if(login.status!=200)throw new IllegalStateException("Login failed. Check credentials and server availability.");
-   String jwt=login.body.getJSONObject("data").getString("token");
+   JSONObject loginData=login.body.getJSONObject("data");
+   String owner=loginData.getString("email");
+   String stored=vault.credential();JSONObject previous=stored==null?null:new JSONObject(stored);
+   boolean sameOwner=previous!=null && owner.equals(previous.optString("owner")) && url.equals(previous.optString("base"));
+   if(previous!=null && !sameOwner)try(Outbox outbox=new Outbox(this)){
+    if(outbox.count()>0)throw new IllegalStateException("Unsynced alerts belong to another account/server. Disconnect explicitly before switching.");
+   }
+   String generation=sameOwner?previous.getString("generation"):UUID.randomUUID().toString();
+   String jwt=loginData.getString("token");
    Api.Reply enrolled=Api.post(url,"/capture/devices",new JSONObject().put("name",android.os.Build.MANUFACTURER+" "+android.os.Build.MODEL),jwt,null);
    if(enrolled.status!=200)throw new IllegalStateException("Could not connect. Check the backend version or revoke an old device on the website.");
    JSONObject data=enrolled.body.getJSONObject("data");
-   // Stop previous work and drop old-account queue before replacing the credential.
-   vault.enabled(false);try(Outbox outbox=new Outbox(this)){outbox.clear();}
-   vault.save(new JSONObject().put("base",url).put("token",data.getString("token")).put("generation",UUID.randomUUID().toString()).toString());
+   // Reconnection preserves this owner's encrypted outbox. Switching an account with pending data requires explicit disconnect.
+   if(!sameOwner){vault.enabled(false);try(Outbox outbox=new Outbox(this)){outbox.clear();}}
+   vault.save(new JSONObject().put("base",url).put("owner",owner).put("token",data.getString("token")).put("generation",generation).toString());
    runOnUiThread(()->{password.setText("");connect.setEnabled(true);requestCapture();});
   }catch(Exception e){runOnUiThread(()->{status.setText(e instanceof IllegalStateException?e.getMessage():"Connection failed. Check server availability and try again.");connect.setEnabled(true);});}});
  }

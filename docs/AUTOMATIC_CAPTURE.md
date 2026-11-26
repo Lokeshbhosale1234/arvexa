@@ -79,7 +79,7 @@ Capture history displays the original timestamp using the viewer's browser timez
 
 The receiver assembles multipart SMS, parses locally, persists encrypted extracted fields, then requests
 WorkManager synchronization. Network/server errors retry with backoff, and periodic work provides another
-sync opportunity. HTTP 401/403 pauses capture and requests reconnect; a rejected payload is retained locally and marked for attention without blocking other alerts. Disconnect deletes the local queue explicitly. Device revocation immediately rejects
+sync opportunity. HTTP 401/403 pauses capture and requests reconnect; a rejected payload is retained locally and marked for attention without blocking other alerts. Reconnecting the same account/server preserves its queued alerts. Switching accounts with a pending queue requires explicit disconnect. Disconnect deletes the local queue explicitly. Device revocation immediately rejects
 new requests; an already in-flight authorized request may finish.
 
 Android battery restrictions, force-stop, permission revocation, network outages and unsupported formats

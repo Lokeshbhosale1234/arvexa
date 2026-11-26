@@ -31,7 +31,7 @@ final class Vault {
   return new String(c.doFinal(Base64.decode(parts[1],Base64.NO_WRAP)),StandardCharsets.UTF_8);
  }
  SharedPreferences prefs(){return context.getSharedPreferences("capture",Context.MODE_PRIVATE);}
- void save(String credential) throws Exception {prefs().edit().putString("credential",encrypt(credential)).commit();}
+ void save(String credential) throws Exception {if(!prefs().edit().putString("credential",encrypt(credential)).commit())throw new java.io.IOException("Could not persist device credential");}
  String credential() throws Exception {String c=prefs().getString("credential",null);return c==null?null:decrypt(c);}
  boolean enabled(){return prefs().getBoolean("enabled",false);}
  void enabled(boolean value){prefs().edit().putBoolean("enabled",value).commit();}

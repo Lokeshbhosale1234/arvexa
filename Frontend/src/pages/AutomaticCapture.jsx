@@ -84,7 +84,7 @@ export default function AutomaticCapture() {
     </section>
     <section className="card" style={{ padding: 20 }} aria-labelledby="capture-devices"><h3 id="capture-devices">Connected devices</h3>
       {devices.map(d => <div key={d.id} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-        <div><strong>{d.name}</strong><p style={{ fontSize: 12 }}>{d.revoked ? 'Revoked' : new Date(d.expiresAt) < new Date() ? 'Expired — reconnect' : 'Connected'} · Last contact: {d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleString() : 'Not yet synced'}</p></div>
+        <div><strong>{d.name}</strong><p style={{ fontSize: 12 }}>{d.revoked ? 'Revoked' : new Date(d.expiresAt) < new Date() ? 'Expired — reconnect' : 'Authorized'} · Last contact: {d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleString() : 'Not yet synced'}</p></div>
         {!d.revoked && <button disabled={busy} className="btn btn-ghost" onClick={() => { if (window.confirm('Revoke this device? Its future sync requests will be rejected.')) act(() => captureApi.revoke(d.id)) }}>Revoke</button>}
       </div>)}
       {!loading && devices.length === 0 && <p style={{ marginTop: 8 }}>No phones connected yet.</p>}

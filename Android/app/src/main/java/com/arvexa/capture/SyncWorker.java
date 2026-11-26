@@ -20,7 +20,9 @@ public final class SyncWorker extends Worker {
      if(!vault.enabled())return Result.success();
      String current=vault.credential();if(current==null||!generation.equals(new JSONObject(current).getString("generation")))return Result.success();
      Api.Reply r=Api.post(base,"/capture/device/ingest",new JSONObject(vault.decrypt(row[1])),null,token);
-     if(r.status==401||r.status==403){vault.status("Connection expired or revoked. Reconnect this device.");vault.enabled(false);return Result.success();}
+     if(r.status==401||r.status==403){String latest=vault.credential();
+      if(latest!=null && token.equals(new JSONObject(latest).optString("token"))){vault.status("Connection expired or revoked. Reconnect this device.");vault.enabled(false);}
+      return Result.success();}
      if(r.status==429||r.status>=500)return Result.retry();
      if(r.status<200||r.status>=300){outbox.reject(row[0],generation);vault.status("An alert was rejected and retained locally for attention. Other alerts can still sync.");continue;}
      outbox.remove(row[0],generation);vault.status("Last synced "+java.time.Instant.now()+". Check the website for imported entries or review items.");
@@ -28,7 +30,7 @@ public final class SyncWorker extends Worker {
     if(outbox.count(generation)>0){schedule(getApplicationContext());return Result.success();}
    }
    Api.Reply heartbeat=Api.post(base,"/capture/device/heartbeat",new JSONObject(),null,token);
-   if(heartbeat.status==401||heartbeat.status==403){vault.enabled(false);vault.status("Reconnect this device.");}
+   if(heartbeat.status==401||heartbeat.status==403){String latest=vault.credential();if(latest!=null&&token.equals(new JSONObject(latest).optString("token"))){vault.enabled(false);vault.status("Reconnect this device.");}}
    else if(heartbeat.status==429||heartbeat.status>=500)return Result.retry();
    return Result.success();
   }catch(Exception e){vault.status("Sync paused; will retry when the server is reachable.");return Result.retry();}
